@@ -13,6 +13,16 @@ if (window.location.pathname === '/notes') {
   newNoteBtn = document.querySelector('.new-note');
   clearBtn = document.querySelector('.clear-btn');
   noteList = document.querySelectorAll('.list-container .list-group');
+
+  console.log('Save Button:', saveNoteBtn);
+  console.log('New Note Button:', newNoteBtn);
+  console.log('Clear Button:', clearBtn);
+
+  // Add console logs to check if event listeners are attached
+  console.log('Save Button Event Listeners:', saveNoteBtn._events);
+  console.log('New Note Button Event Listeners:', newNoteBtn._events);
+  console.log('Clear Button Event Listeners:', clearBtn._events);
+
 }
 
 // Show an element
@@ -73,6 +83,7 @@ const renderActiveNote = () => {
 };
 
 const handleNoteSave = () => {
+  console.log('Save button clicked');
   const newNote = {
     title: noteTitle.value,
     text: noteText.value
@@ -85,6 +96,7 @@ const handleNoteSave = () => {
 
 // Delete the clicked note
 const handleNoteDelete = (e) => {
+  console.log('Delete button clicked');
   // Prevents the click listener for the list from being called when the button inside of it is clicked
   e.stopPropagation();
 
@@ -103,6 +115,7 @@ const handleNoteDelete = (e) => {
 
 // Sets the activeNote and displays it
 const handleNoteView = (e) => {
+  console.log('View note clicked');
   e.preventDefault();
   activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
   renderActiveNote();
@@ -110,6 +123,7 @@ const handleNoteView = (e) => {
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
 const handleNewNoteView = (e) => {
+  console.log('New note button clicked');
   activeNote = {};
   show(clearBtn);
   renderActiveNote();
@@ -117,6 +131,7 @@ const handleNewNoteView = (e) => {
 
 // Renders the appropriate buttons based on the state of the form
 const handleRenderBtns = () => {
+  console.log('Rendering buttons');
   show(clearBtn);
   if (!noteTitle.value.trim() && !noteText.value.trim()) {
     hide(clearBtn);
