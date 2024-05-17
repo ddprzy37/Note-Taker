@@ -2,6 +2,8 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const util = require('util');
+const readFileAsync = util.promisify(fs.readFile)
 
 // Create an instance of Express
 const app = express();
@@ -26,18 +28,33 @@ app.get('/notes', (req, res) => {
 });
 
 // need to add a get route for the api to get rendered
-app.get('/api/notes', (req, res) => {
-    const notesData = getNotes()
-    return res.json(notesData);
-})
+app.get('/api/notes', async (req, res) => {
+  try {
+    const notes = await getNotes();
+    console.log(notes);
+    res.json(notes);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
 
+//     const notesData = getNotes()
+//     return res.json(notesData);
 // Read existing notes from the 'db.json' file
-const getNotes = () => {
-  const notesData = fs.readFileSync(path.join(__dirname, './db/db.json'), 'utf8');
-  console.log(notesData);
-  return JSON.parse(notesData);
+function readDb () {
+  return readFileAsync(( './db/db.json'), 'utf8');
+}
+const getNotes = async () => {
+  try {
+    const notesData = await readDb();
+    const parsedNotes = [].concat(JSON.parse(notesData));
+    return parsedNotes;
+  } catch (error) {
+    throw error;
+  }
 };
+
 
 // Write notes to the 'db.json' file
 const saveNotes = (notes) => {
