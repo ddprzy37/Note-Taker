@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
-const readFileAsync = util.promisify(fs.readFile)
+const readFileAsync = util.promisify(fs.readFile);
 
 // Create an instance of Express
 const app = express();
@@ -27,7 +27,7 @@ app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
-// need to add a get route for the api to get rendered
+// Add a GET route for the API to get rendered notes
 app.get('/api/notes', async (req, res) => {
   try {
     const notes = await getNotes();
@@ -38,13 +38,12 @@ app.get('/api/notes', async (req, res) => {
   }
 });
 
-
-//     const notesData = getNotes()
-//     return res.json(notesData);
 // Read existing notes from the 'db.json' file
-function readDb () {
-  return readFileAsync(( './db/db.json'), 'utf8');
+function readDb() {
+  return readFileAsync('./db/db.json', 'utf8');
 }
+
+// Function to get notes asynchronously
 const getNotes = async () => {
   try {
     const notesData = await readDb();
@@ -55,30 +54,38 @@ const getNotes = async () => {
   }
 };
 
-
 // Write notes to the 'db.json' file
 const saveNotes = (notes) => {
   fs.writeFileSync(path.join(__dirname, './db/db.json'), JSON.stringify(notes));
 };
 
 // Create a new note
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', async (req, res) => {
   const newNote = req.body;
-  const notes = getNotes();
-  newNote.id = Date.now().toString(); // Assign a unique ID to the new note
-  notes.push(newNote);
-  saveNotes(notes);
-  res.json(newNote);
+  try {
+    let notes = await getNotes(); // Wait for getNotes() to resolve
+    newNote.id = Date.now().toString(); // Assign a unique ID to the new note
+    notes.push(newNote);
+    saveNotes(notes);
+    res.json(newNote);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create a new note' });
+  }
 });
 
 // Delete a note by ID
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', async (req, res) => {
   const noteId = req.params.id;
-  const notes = getNotes();
-  const updatedNotes = notes.filter((note) => note.id !== noteId);
-  saveNotes(updatedNotes);
-  res.sendStatus(200);
+  try {
+    let notes = await getNotes(); // Wait for getNotes() to resolve
+    const updatedNotes = notes.filter((note) => note.id !== noteId);
+    saveNotes(updatedNotes);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete the note' });
+  }
 });
+
 
 // Start the server
 app.listen(PORT, () => {
