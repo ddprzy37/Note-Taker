@@ -37,8 +37,6 @@ This project allows the user to quickly write notes on demand.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following:
-
 
 ## Getting Started
 
